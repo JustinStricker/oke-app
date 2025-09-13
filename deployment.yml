@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ktor-oke-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ktor-oke-app
+  template:
+    metadata:
+      labels:
+        app: ktor-oke-app
+    spec:
+      containers:
+      - name: ktor-oke-container
+        # This will be replaced by the GitHub Action with your actual image
+        image: your-ocir-repo/ktor-oke-app:latest 
+        ports:
+        - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ktor-oke-service
+spec:
+  # This creates the public-facing Load Balancer in OCI
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 8080
+  selector:
+    # This connects the Service to the Deployment's pods
+    app: ktor-oke-app
