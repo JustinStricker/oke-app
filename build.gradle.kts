@@ -1,5 +1,12 @@
+import org.gradle.api.JavaVersion
+import io.ktor.plugin.features.DockerImageRegistry
+
 val kotlin_version: String by project
 val logback_version: String by project
+
+repositories {
+    mavenCentral()
+}
 
 plugins {
     kotlin("jvm") version "2.2.20"
@@ -20,4 +27,10 @@ dependencies {
     implementation("io.ktor:ktor-server-config-yaml")
     testImplementation("io.ktor:ktor-server-test-host")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+}
+
+ktor {
+    docker {
+        jreVersion.set(JavaVersion.VERSION_17)
+    }
 }
