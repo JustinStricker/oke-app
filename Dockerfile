@@ -19,8 +19,8 @@ RUN chmod +x ./gradlew
 RUN ./gradlew shadowJar --no-daemon
 
 # ---- Package Stage ----
-# Use a lightweight JRE image for the final container to reduce size
-FROM openjdk:17-jre-slim
+# Use a lightweight JRE image from the Eclipse Temurin project
+FROM eclipse-temurin:17-jre-focal
 
 # Set the working directory
 WORKDIR /app
