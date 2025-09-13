@@ -5,8 +5,9 @@ FROM gradle:8.3-jdk17-focal AS build
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy the Gradle wrapper, build script, and settings file
+# Copy the Gradle wrapper, build script, settings file, and the gradle directory
 COPY gradlew build.gradle.kts settings.gradle.kts ./
+COPY gradle ./gradle
 
 # Copy the source code of the application
 COPY src ./src
