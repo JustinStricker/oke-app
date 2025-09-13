@@ -1,18 +1,16 @@
-name: Deploy oke-app to OKE
+name: Deploy Ktor App to OKE
 
+# This workflow runs on pushes and pull requests to the main branch
 on:
   push:
-    branches:
-      - main # This workflow runs on pushes to the main branch
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   build-and-push:
     name: Build and Push to OCIR
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -23,11 +21,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x ./gradlew
-
       - name: Build with Gradle
-        # This runs the 'shadowJar' task to create a single executable JAR
         run: ./gradlew shadowJar --no-daemon
 
       - name: Log in to Oracle Cloud Infrastructure Registry
@@ -41,20 +35,22 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./Dockerfile
           push: true
-          # Tags the image with the project name and the Git commit SHA for versioning
+          # The image is tagged with the unique Git commit SHA
           tags: ${{ secrets.OCIR_REGION_KEY }}.ocir.io/${{ secrets.OCIR_TENANCY_NAMESPACE }}/oke-app:${{ github.sha }}
 
   deploy:
     name: Deploy to OKE
-    needs: build-and-push # This job runs only after the build-and-push job succeeds
+    # This job depends on the build-and-push job and only runs on a push to main
+    needs: build-and-push
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      # THIS IS THE CORRECTED STEP:
+      # It now correctly points to the official Oracle action.
       - name: Configure Kubeconfig
         uses: oracle-actions/configure-kubeconfig@v1
         with:
@@ -64,9 +60,8 @@ jobs:
           fingerprint: ${{ secrets.OCI_FINGERPRINT }}
           private_key: ${{ secrets.OCI_PRIVATE_KEY }}
           region: ${{ secrets.OCI_REGION }}
-      
+
       - name: Replace Image Placeholder in Deployment Manifest
-        # This step finds the placeholder in deployment.yml and replaces it with the actual image URL
         run: |
           sed -i 's|your-ocir-repo/ktor-oke-app:latest|${{ secrets.OCIR_REGION_KEY }}.ocir.io/${{ secrets.OCIR_TENANCY_NAMESPACE }}/oke-app:${{ github.sha }}|g' deployment.yml
 
