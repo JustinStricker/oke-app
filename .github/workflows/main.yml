@@ -49,10 +49,9 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # THIS IS THE CORRECTED STEP:
-      # It now correctly points to the official Oracle action.
-      - name: Configure Kubeconfig
-        uses: oracle-actions/configure-kubeconfig@v1
+      # THIS STEP HAS BEEN UPDATED to use the specific version v1.5.0 as requested.
+      - name: Configure Kubectl for OKE
+        uses: oracle-actions/configure-kubectl-oke@v1.5.0
         with:
           cluster: ${{ secrets.OKE_CLUSTER_OCID }}
           tenancy: ${{ secrets.OCI_TENANCY_OCID }}
