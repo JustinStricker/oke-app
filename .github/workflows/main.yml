@@ -45,20 +45,22 @@ jobs:
     needs: build-and-push
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
+    # THIS ENV BLOCK IS ADDED to provide credentials to the OKE action.
+    env:
+      OCI_CLI_USER: ${{ secrets.OCI_USER_OCID }}
+      OCI_CLI_TENANCY: ${{ secrets.OCI_TENANCY_OCID }}
+      OCI_CLI_FINGERPRINT: ${{ secrets.OCI_FINGERPRINT }}
+      OCI_CLI_KEY_CONTENT: ${{ secrets.OCI_PRIVATE_KEY }}
+      OCI_CLI_REGION: ${{ secrets.OCI_REGION }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-
-      # THIS STEP HAS BEEN UPDATED to use the specific version v1.5.0 as requested.
+      
+      # The separate "Set up OCI CLI" step has been removed.
       - name: Configure Kubectl for OKE
         uses: oracle-actions/configure-kubectl-oke@v1.5.0
         with:
           cluster: ${{ secrets.OKE_CLUSTER_OCID }}
-          tenancy: ${{ secrets.OCI_TENANCY_OCID }}
-          user: ${{ secrets.OCI_USER_OCID }}
-          fingerprint: ${{ secrets.OCI_FINGERPRINT }}
-          private_key: ${{ secrets.OCI_PRIVATE_KEY }}
-          region: ${{ secrets.OCI_REGION }}
 
       - name: Replace Image Placeholder in Deployment Manifest
         run: |
