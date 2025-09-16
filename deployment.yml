@@ -14,8 +14,8 @@ spec:
     spec:
       containers:
       - name: ktor-oke-container
-        # This will be replaced by the GitHub Action with your actual image
-        image: your-ocir-repo/ktor-oke-app:latest 
+        # IMPORTANT: Remember to replace this with your actual image path in your OCIR repository
+        image: your-ocir-repo/ktor-oke-app:latest
         ports:
         - containerPort: 8080
         livenessProbe:
@@ -35,12 +35,17 @@ apiVersion: v1
 kind: Service
 metadata:
   name: ktor-oke-service
+  annotations:
+    # This key annotation requests the 10Mbps shape, which is part of the OCI "Always Free" tier.
+    service.beta.kubernetes.io/oci-load-balancer-shape: "10Mbps"
 spec:
-  # This creates the public-facing Load Balancer in OCI
+  # This creates the public-facing Load Balancer in OCI.
   type: LoadBalancer
   ports:
+    # The load balancer will listen on port 80 (standard HTTP).
     - port: 80
+      # Traffic will be forwarded to port 8080 on the pods.
       targetPort: 8080
   selector:
-    # This connects the Service to the Deployment's pods
+    # This connects the Service to the pods with the label "app: ktor-oke-app".
     app: ktor-oke-app
