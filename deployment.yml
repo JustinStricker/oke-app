@@ -36,8 +36,12 @@ kind: Service
 metadata:
   name: ktor-oke-service
   annotations:
-    # This key annotation requests the 10Mbps shape, which is part of the OCI "Always Free" tier.
-    service.beta.kubernetes.io/oci-load-balancer-shape: "10Mbps"
+    # ⚠️ CHANGE: Switched from deprecated "10Mbps" fixed shape to the "flexible" shape.
+    service.beta.kubernetes.io/oci-load-balancer-shape: "flexible"
+    # Set the minimum bandwidth to 10 Mbps. This is the Always Free tier minimum/base.
+    service.beta.kubernetes.io/oci-load-balancer-shape-flex-min: "10"
+    # Set the maximum bandwidth to 10 Mbps. This caps the size to keep it in the Always Free tier.
+    service.beta.kubernetes.io/oci-load-balancer-shape-flex-max: "10"
 spec:
   # This creates the public-facing Load Balancer in OCI.
   type: LoadBalancer
