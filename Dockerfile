@@ -3,7 +3,8 @@
 FROM gradle:8.9.0-jdk21 AS cache
 RUN mkdir -p /home/gradle/cache_home
 ENV GRADLE_USER_HOME=/home/gradle/cache_home
-COPY build.gradle.kts settings.gradle.kts /home/gradle/app/
+# Corrected the COPY command to include gradle.properties
+COPY build.gradle.kts settings.gradle.kts gradle.properties /home/gradle/app/
 WORKDIR /home/gradle/app
 # Run dependency resolution to populate the cache
 RUN gradle dependencies --no-daemon
@@ -20,7 +21,7 @@ WORKDIR /home/gradle/src
 RUN gradle shadowJar --no-daemon
 
 # Stage 3: Create the Runtime Image
-# Use a JRE (Java Runtime Environment) which is smaller than a full JDK
+# Use a JRE (Java Runtim<e Environment) which is smaller than a full JDK
 # Switched to eclipse-temurin for better multi-platform (ARM64) support
 FROM eclipse-temurin:21-jre AS runtime
 EXPOSE 8080
