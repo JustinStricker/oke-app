@@ -1,7 +1,6 @@
 import org.gradle.api.JavaVersion
-import io.ktor.plugin.features.DockerImageRegistry
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val kotlin_version: String by project
 val logback_version: String by project
 
 repositories {
@@ -9,8 +8,9 @@ repositories {
 }
 
 plugins {
-    kotlin("jvm") version "2.2.20"
-    id("io.ktor.plugin") version "3.3.0"
+    kotlin("jvm") version "2.0.0" // Use a stable Kotlin version
+    id("io.ktor.plugin") version "2.3.12"
+    id("com.github.johnrengelman.shadow") version "8.1.1" // Add shadow plugin for fat JARs
 }
 
 group = "com.example"
@@ -20,17 +20,23 @@ application {
     mainClass = "io.ktor.server.netty.EngineMain"
 }
 
-dependencies {
-    implementation("io.ktor:ktor-server-core")
-    implementation("io.ktor:ktor-server-netty")
-    implementation("ch.qos.logback:logback-classic:$logback_version")
-    implementation("io.ktor:ktor-server-config-yaml")
-    testImplementation("io.ktor:ktor-server-test-host")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+// Add this block to enforce a consistent JDK version for compilation
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
 }
 
-ktor {
-    docker {
-        jreVersion.set(JavaVersion.VERSION_17)
-    }
+dependencies {
+    implementation("io.ktor:ktor-server-core-jvm")
+    implementation("io.ktor:ktor-server-netty-jvm")
+    implementation("ch.qos.logback:logback-classic:$logback_version")
+    implementation("io.ktor:ktor-server-config-yaml")
+    testImplementation("io.ktor:ktor-server-tests-jvm")
+    testImplementation(kotlin("test-junit"))
+}
+
+// Configure Kotlin tasks to use the same JVM target
+tasks.withType<KotlinCompile> {
+    kotlinOptions.jvmTarget = "21"
 }
