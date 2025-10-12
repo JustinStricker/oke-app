@@ -52,6 +52,17 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      # Diagnostic Step to verify credentials and permissions
+      - name: Install OCI CLI and Test Connection
+        run: |
+          # Install the OCI CLI
+          curl -L -o oci_cli_install.sh https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh
+          bash oci_cli_install.sh --accept-all-defaults
+
+          # Run a simple read-only command to test authentication
+          echo "Verifying OCI credentials by listing regions..."
+          ~/bin/oci iam region list
+
       - name: Configure Kubectl for OKE
         uses: oracle-actions/configure-kubectl-oke@v1.5.0
         with:
