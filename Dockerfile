@@ -21,8 +21,8 @@ RUN gradle shadowJar --no-daemon
 
 # Stage 3: Create the Runtime Image
 # Use a JRE (Java Runtime Environment) which is smaller than a full JDK
-# Corrected the image tag from '22-al2-jre' to the valid '22-al2023-jre'
-FROM amazoncorretto:22-al2023-jre AS runtime
+# Changed the tag to use the JRE for version 21
+FROM amazoncorretto:21-jre AS runtime
 EXPOSE 8080
 RUN mkdir /app
 # Correctly copy the JAR from the build stage. The shadowJar task produces a jar with "-all" in the name.
