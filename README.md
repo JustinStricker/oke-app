@@ -13,9 +13,19 @@ Here are some useful links to get you started:
 
 Here's a list of features included in this project:
 
-| Name                                       | Description                       |
-|--------------------------------------------|-----------------------------------|
-| [Routing](https://start.ktor.io/p/routing) | Provides a structured routing DSL |
+| Name                                       | Description                                              |
+|--------------------------------------------|----------------------------------------------------------|
+| [Routing](https://start.ktor.io/p/routing) | Provides a structured routing DSL                        |
+| **Counter Service**                        | Thread-safe counter with AtomicInteger implementation    |
+
+## API Endpoints
+
+| Endpoint   | Method | Description                          |
+|------------|--------|--------------------------------------|
+| `/`        | GET    | Returns current counter value + instructions |
+| `/counter` | GET    | Increments counter and returns new value |
+
+## Building & Running
 
 ## Building & Running
 
@@ -38,3 +48,18 @@ If the server starts successfully, you'll see the following output:
 2024-12-04 14:32:45.682 [main] INFO  Application - Responding at http://0.0.0.0:8080
 ```
 
+### Testing Endpoints
+- View counter: `curl http://localhost:8080`
+- Increment counter: `curl http://localhost:8080/counter`
+
+Example session:
+```bash
+$ curl http://localhost:8080
+Current counter value: 0
+Increment the counter by visiting /counter
+
+$ curl http://localhost:8080/counter
+Counter incremented!
+New value: 1
+Return to main page: /
+```
